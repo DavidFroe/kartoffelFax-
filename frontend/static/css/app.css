@@ -1,0 +1,5 @@
+/* Small overrides on top of Tailwind utility classes */
+.folder-item.active {
+  background-color: rgb(254 243 199); /* amber-100 */
+  font-weight: 600;
+}

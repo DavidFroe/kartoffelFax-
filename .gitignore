@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Data / runtime
+*.db
+*.db-journal
+*.sqlite3
+data/
+*.log
+
+# Secrets
+.env
+*.pem
+*.key
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Packaging output
+packaging/pyinstaller/build/
+packaging/pyinstaller/dist/
+*.spec
+
+# Misc local session artifacts (not part of the project)
+.clau.conf
