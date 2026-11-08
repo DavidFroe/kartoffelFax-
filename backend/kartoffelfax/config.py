@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     inbox_dir: str = "inbox"
     outbox_dir: str = "outbox"
     archive_dir: str = "archive"
+    uploads_dir: str = "uploads"
     log_level: str = "INFO"
 
     def resolved_database_path(self) -> Path:
@@ -22,7 +23,7 @@ class Settings(BaseSettings):
         return self.data_dir / "kartoffelfax.db"
 
     def ensure_directories(self) -> None:
-        for sub in (self.inbox_dir, self.outbox_dir, self.archive_dir):
+        for sub in (self.inbox_dir, self.outbox_dir, self.archive_dir, self.uploads_dir):
             (self.data_dir / sub).mkdir(parents=True, exist_ok=True)
 
 
