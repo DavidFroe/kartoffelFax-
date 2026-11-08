@@ -52,14 +52,11 @@ async def merge_to_pdf(source_paths: list[Path], output_path: Path) -> Path:
     return output_path
 
 
-async def pdf_to_g3_tiff(pdf_path: Path, output_path: Path, fine_resolution: bool = True) -> Path:
+async def run_ghostscript(*args: str, input_path: Path, output_path: Path) -> Path:
     gs = shutil.which("gs")
     if gs is None:
         raise FaxConversionError("Ghostscript (`gs`) is not installed or not on PATH")
-    if not pdf_path.is_file():
-        raise FaxConversionError(f"PDF not found: {pdf_path}")
 
-    x_dpi, y_dpi = FINE_DPI if fine_resolution else STANDARD_DPI
     output_path.parent.mkdir(parents=True, exist_ok=True)
     proc = await asyncio.create_subprocess_exec(
         gs,
@@ -67,13 +64,9 @@ async def pdf_to_g3_tiff(pdf_path: Path, output_path: Path, fine_resolution: boo
         "-dNOPAUSE",
         "-dBATCH",
         "-dSAFER",
-        "-sDEVICE=tiffg3",
-        "-sPAPERSIZE=a4",
-        "-dFIXEDMEDIA",
-        "-dPDFFitPage",
-        f"-r{x_dpi}x{y_dpi}",
+        *args,
         f"-sOutputFile={output_path}",
-        str(pdf_path),
+        str(input_path),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
@@ -84,3 +77,19 @@ async def pdf_to_g3_tiff(pdf_path: Path, output_path: Path, fine_resolution: boo
     if not output_path.is_file() or output_path.stat().st_size == 0:
         raise FaxConversionError("Ghostscript produced no output")
     return output_path
+
+
+async def pdf_to_g3_tiff(pdf_path: Path, output_path: Path, fine_resolution: bool = True) -> Path:
+    if not pdf_path.is_file():
+        raise FaxConversionError(f"PDF not found: {pdf_path}")
+
+    x_dpi, y_dpi = FINE_DPI if fine_resolution else STANDARD_DPI
+    return await run_ghostscript(
+        "-sDEVICE=tiffg3",
+        "-sPAPERSIZE=a4",
+        "-dFIXEDMEDIA",
+        "-dPDFFitPage",
+        f"-r{x_dpi}x{y_dpi}",
+        input_path=pdf_path,
+        output_path=output_path,
+    )
