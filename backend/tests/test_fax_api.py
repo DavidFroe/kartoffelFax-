@@ -79,3 +79,30 @@ async def test_list_get_delete(client: httpx.AsyncClient) -> None:
 async def test_missing_message_returns_404(client: httpx.AsyncClient) -> None:
     assert (await client.get("/api/fax/message/999")).status_code == 404
     assert (await client.delete("/api/fax/message/999")).status_code == 404
+
+
+async def test_events_timeline_and_pdf(client: httpx.AsyncClient, tmp_path: Path) -> None:
+    fax = (await client.post("/api/fax/send", json={"fax_number": "111"})).json()
+
+    events = (await client.get(f"/api/fax/message/{fax['id']}/events")).json()
+    assert [e["event_type"] for e in events] == ["queued"]
+
+    assert (await client.get(f"/api/fax/message/{fax['id']}/pdf")).status_code == 404
+
+    (tmp_path / "outbox").mkdir(exist_ok=True)
+    (tmp_path / "outbox" / "x.pdf").write_bytes(b"%PDF-1.4")
+    conn = sqlite3.connect(tmp_path / "test.db")
+    try:
+        conn.execute("UPDATE fax_messages SET pdf_path = 'outbox/x.pdf' WHERE id = ?", (fax["id"],))
+        conn.commit()
+        resp = await client.get(f"/api/fax/message/{fax['id']}/pdf")
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "application/pdf"
+
+        conn.execute("UPDATE fax_messages SET pdf_path = '../test.db' WHERE id = ?", (fax["id"],))
+        conn.commit()
+    finally:
+        conn.close()
+    assert (await client.get(f"/api/fax/message/{fax['id']}/pdf")).status_code == 404
+
+    assert (await client.get("/api/fax/message/999/events")).status_code == 404

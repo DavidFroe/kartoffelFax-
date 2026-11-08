@@ -72,3 +72,13 @@ async def delete_message(fax_id: int) -> bool:
         cursor = await db.execute("DELETE FROM fax_messages WHERE id = ?", (fax_id,))
         await db.commit()
         return cursor.rowcount > 0
+
+
+async def list_events(fax_id: int) -> list[dict[str, Any]]:
+    async with get_connection() as db:
+        cursor = await db.execute(
+            "SELECT id, event_type, detail, created_at FROM fax_events "
+            "WHERE fax_message_id = ? ORDER BY id",
+            (fax_id,),
+        )
+        return [dict(row) for row in await cursor.fetchall()]

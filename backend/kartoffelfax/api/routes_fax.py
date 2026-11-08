@@ -5,8 +5,10 @@ import mimetypes
 import re
 import uuid
 from pathlib import Path
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 
 from kartoffelfax.config import settings
 from kartoffelfax.db.repositories import fax_repository as repo
@@ -37,6 +39,25 @@ async def get_fax_message(fax_id: int) -> FaxMessage:
     if row is None:
         raise HTTPException(status_code=404, detail="Fax message not found")
     return FaxMessage.model_validate(row)
+
+
+@router.get("/message/{fax_id}/events")
+async def get_fax_events(fax_id: int) -> list[dict[str, Any]]:
+    if await repo.get_message(fax_id) is None:
+        raise HTTPException(status_code=404, detail="Fax message not found")
+    return await repo.list_events(fax_id)
+
+
+@router.get("/message/{fax_id}/pdf")
+async def get_fax_pdf(fax_id: int) -> FileResponse:
+    row = await repo.get_message(fax_id)
+    if row is None or not row["pdf_path"]:
+        raise HTTPException(status_code=404, detail="No PDF available")
+    data_dir = settings.data_dir.resolve()
+    path = (data_dir / row["pdf_path"]).resolve()
+    if not path.is_relative_to(data_dir) or not path.is_file():
+        raise HTTPException(status_code=404, detail="No PDF available")
+    return FileResponse(path, media_type="application/pdf")
 
 
 @router.post("/send", response_model=FaxMessage, status_code=201)
