@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     archive_dir: str = "archive"
     uploads_dir: str = "uploads"
     log_level: str = "INFO"
+    secret_key: str = ""  # Fernet key; if empty, generated once and stored in data_dir/secret.key
 
     def resolved_database_path(self) -> Path:
         if self.database_url:
