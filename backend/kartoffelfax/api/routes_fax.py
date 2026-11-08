@@ -1,7 +1,7 @@
 """REST endpoints for fax messages (inbox/outbox/drafts/archive)."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, UploadFile
 
 from kartoffelfax.schemas.fax import FaxFolder, FaxMessage, FaxMessageCreate
 

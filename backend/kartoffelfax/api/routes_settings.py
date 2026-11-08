@@ -1,9 +1,8 @@
 """Endpoints for app settings and Fritz!Box connection profiles (TR-064/SIP/VPN)."""
 from __future__ import annotations
 
-from pydantic import BaseModel
-
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 

@@ -1,9 +1,9 @@
 """SQLite connection handling and schema bootstrap (async via aiosqlite)."""
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from importlib import resources
-from typing import AsyncIterator
 
 import aiosqlite
 

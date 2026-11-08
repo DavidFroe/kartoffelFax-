@@ -6,7 +6,6 @@ only needs an IP/port reachable from this host (VPN-side Fritz!Box IP, e.g.
 """
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 
 import httpx
@@ -41,7 +40,7 @@ class TR064Client:
             async with httpx.AsyncClient(timeout=self._timeout) as client:
                 resp = await client.get(f"{self.base_url}/tr64desc.xml")
                 return resp.status_code == 200
-        except (httpx.ConnectError, httpx.TimeoutException, asyncio.TimeoutError):
+        except (TimeoutError, httpx.ConnectError, httpx.TimeoutException):
             return False
 
     async def get_device_info(self) -> dict[str, str]:
