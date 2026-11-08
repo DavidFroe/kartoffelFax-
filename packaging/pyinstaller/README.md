@@ -1,4 +1,15 @@
 # PyInstaller packaging
 
-Planned: a `.spec` file bundling `backend/kartoffelfax` + `frontend/` into a
-single-file executable for Windows 11 and Linux. Not yet implemented.
+Build from the repository root (needs `pip install -e ".[packaging]"`):
+
+```bash
+pyinstaller packaging/pyinstaller/kartoffelfax.spec
+```
+
+Result: single-file executable `dist/kartoffelfax` that serves the bundled
+frontend. Ghostscript (`gs`) is **not** bundled and must be installed on the
+target system.
+
+Status: Linux build verified (binary starts, serves the UI, creates the DB and
+encrypts credentials). The Windows build uses the same spec but has **not**
+been tested.

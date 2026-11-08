@@ -1,0 +1,27 @@
+# UNTESTED skeleton: flatpak-builder was not available when this was written.
+# Open items before this can build offline / go to Flathub:
+#  - Python dependencies must be pinned as sources (flatpak-pip-generator); the
+#    `pip install` below needs network access and is only suitable for local builds.
+#  - Ghostscript (`gs`) must be provided as an additional module or runtime extension.
+app-id: com.kartoffelfax.KartoffelFax
+runtime: org.freedesktop.Platform
+runtime-version: "24.08"
+sdk: org.freedesktop.Sdk
+command: kartoffelfax
+finish-args:
+  - --share=network
+  - --env=KARTOFFELFAX_DATA_DIR=/var/data
+  - --env=KARTOFFELFAX_FRONTEND_DIR=/app/share/kartoffelfax/frontend
+modules:
+  - name: kartoffelfax
+    buildsystem: simple
+    build-options:
+      build-args:
+        - --share=network
+    build-commands:
+      - pip3 install --prefix=/app --no-cache-dir .
+      - mkdir -p /app/share/kartoffelfax
+      - cp -r frontend /app/share/kartoffelfax/frontend
+    sources:
+      - type: dir
+        path: ../..

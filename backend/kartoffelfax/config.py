@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     archive_dir: str = "archive"
     uploads_dir: str = "uploads"
     log_level: str = "INFO"
+    host: str = "127.0.0.1"
+    port: int = 8420
+    frontend_dir: Path | None = None  # override when frontend/ is not next to the package
     secret_key: str = ""  # Fernet key; if empty, generated once and stored in data_dir/secret.key
 
     def resolved_database_path(self) -> Path:

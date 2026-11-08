@@ -28,6 +28,7 @@ data/
 packaging/pyinstaller/build/
 packaging/pyinstaller/dist/
 *.spec
+!packaging/pyinstaller/kartoffelfax.spec
 
 # Misc local session artifacts (not part of the project)
 .clau.conf

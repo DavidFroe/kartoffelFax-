@@ -101,3 +101,14 @@ async def test_connection_test_reports_unreachable_box(
 
 async def test_connection_test_unknown_id_is_404(client: httpx.AsyncClient) -> None:
     assert (await client.post("/api/settings/connections/999/test")).status_code == 404
+
+
+def test_frontend_dir_resolution(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    from kartoffelfax import main
+    from kartoffelfax.config import settings
+
+    monkeypatch.setattr(settings, "frontend_dir", tmp_path)
+    assert main.resolve_frontend_dir() == tmp_path
+
+    monkeypatch.setattr(settings, "frontend_dir", None)
+    assert (main.resolve_frontend_dir() / "index.html").is_file()

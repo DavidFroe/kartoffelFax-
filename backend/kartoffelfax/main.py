@@ -1,6 +1,7 @@
 """KartoffelFax FastAPI application entry point."""
 from __future__ import annotations
 
+import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -8,9 +9,19 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from kartoffelfax.api import routes_contacts, routes_fax, routes_settings, websocket
+from kartoffelfax.config import settings
 from kartoffelfax.db.database import init_db
 
-FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
+
+def resolve_frontend_dir() -> Path:
+    if settings.frontend_dir:
+        return settings.frontend_dir
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS) / "frontend"  # type: ignore[attr-defined]
+    return Path(__file__).resolve().parents[2] / "frontend"
+
+
+FRONTEND_DIR = resolve_frontend_dir()
 
 
 @asynccontextmanager
@@ -34,7 +45,7 @@ def run() -> None:
     """Console-script entry point (`kartoffelfax`), see pyproject.toml."""
     import uvicorn
 
-    uvicorn.run("kartoffelfax.main:app", host="127.0.0.1", port=8420, reload=False)
+    uvicorn.run(app, host=settings.host, port=settings.port, reload=False)
 
 
 if __name__ == "__main__":
