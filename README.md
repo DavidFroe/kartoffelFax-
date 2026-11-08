@@ -55,7 +55,16 @@ kartoffelFax/
 └── docs/
 ```
 
+## Systemvoraussetzungen
+
+- **Python** ≥ 3.11
+- **Ghostscript** (`gs` im `PATH`) – rastert PDFs zu faxtauglichen G3-TIFFs.
+  Debian/Ubuntu/Mint: `sudo apt install ghostscript`, Windows: Installer von
+  <https://ghostscript.com/releases/gsdnld.html>.
+
 ## Entwicklung
+
+`scripts/dev.sh {setup|test|lint|run}` kapselt die Befehle unten.
 
 ```bash
 python3 -m venv .venv
